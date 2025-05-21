@@ -146,6 +146,11 @@ class WindowGrabber:
 
                 if deck_controller.page_auto_loaded:
                     active_page_change_info = gl.page_manager.auto_change_info.get(os.path.abspath(deck_controller.active_page.json_path))
+                    if active_page_change_info.get("restore_on_leave", False):
+                        last_page = gl.page_manager.get_page(deck_controller.last_manual_loaded_page_path, deck_controller)
+                        deck_controller.load_page(last_page)
+                        deck_controller.page_auto_loaded = False
+                        return
                     if active_page_change_info.get("stay_on_page", True):
                         continue
                     deck_controller.page_auto_loaded = False

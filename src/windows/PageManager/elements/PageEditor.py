@@ -207,6 +207,9 @@ class AutoChangeGroup(Adw.PreferencesGroup):
         self.stay_on_page = Adw.SwitchRow(title="Stay on page", subtitle="Stay on the page until another page matches")
         self.add(self.stay_on_page)
 
+        self.restore_on_leave = Adw.SwitchRow(title="Restore on leave", subtitle="Restore the last page when you leave an automatically loaded page")
+        self.add(self.restore_on_leave)
+
         self.title_entry = Adw.EntryRow(title=gl.lm.get("page-manager.page-editor.change-group.title-regex"), text="", show_apply_button=True)
         self.add(self.title_entry)
 
@@ -229,12 +232,14 @@ class AutoChangeGroup(Adw.PreferencesGroup):
     def connect_signals(self):
         self.enable_row.connect("notify::active", self.on_filter_apply)
         self.stay_on_page.connect("notify::active", self.on_filter_apply)
+        self.restore_on_leave.connect("notify::active", self.on_filter_apply)
         self.wm_class_entry.connect("apply", self.on_filter_apply)
         self.title_entry.connect("apply", self.on_filter_apply)
 
     def disconnect_signals(self):
         self.enable_row.disconnect_by_func(self.on_filter_apply)
         self.stay_on_page.disconnect_by_func(self.on_filter_apply)
+        self.restore_on_leave.disconnect_by_func(self.on_filter_apply)
         self.wm_class_entry.disconnect_by_func(self.on_filter_apply)
         self.title_entry.disconnect_by_func(self.on_filter_apply)
 
@@ -245,7 +250,8 @@ class AutoChangeGroup(Adw.PreferencesGroup):
             "enable": self.enable_row.get_active(),
             "wm_class": self.wm_class_entry.get_text(),
             "title": self.title_entry.get_text(),
-            "stay_on_page": self.stay_on_page.get_active()
+            "stay_on_page": self.stay_on_page.get_active(),
+            "restore_on_leave": self.restore_on_leave.get_active()
         }
         gl.page_manager.set_auto_change_info_for_page(page_path=self.page_editor.active_page_path,
                                                       info=auto_change)
@@ -278,6 +284,7 @@ class AutoChangeGroup(Adw.PreferencesGroup):
 
         self.enable_row.set_active(auto_change.get("enable", False))
         self.stay_on_page.set_active(auto_change.get("stay_on_page", True))
+        self.restore_on_leave.set_active(auto_change.get("restore_on_leave", False))
         self.wm_class_entry.set_text(auto_change.get("wm_class", ""))
         self.title_entry.set_text(auto_change.get("title", ""))
         self.device_selector.set_selected_deck_serials(auto_change.get("decks", []).copy())
